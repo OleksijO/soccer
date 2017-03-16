@@ -21,9 +21,9 @@ public class Game {
     }
 
     public boolean[] teamShotSuccessful(int teamNumber, boolean isSuccessful, String playerName) {
-//        if (isFinished()){
-//            throw new IllegalStateException("The game is OVER!");
-//        }
+        if (isFinished()){
+            throw new IllegalStateException("The game is OVER!");
+        }
         strikesCount++;
         addPlayerStatistics(playerName, isSuccessful);
         if (isSuccessful) {
@@ -66,11 +66,7 @@ public class Game {
 
     public boolean isFinished() {
         if ((strikesCount < 10) && isPairOfShotsFull()) {
-            if (scoreDifference() > strikesTo5()) {
-                return true;
-            } else {
-                return false;
-            }
+            return scoreDifference() > strikesTo5();
         }
         if ((strikesCount == 10)) {
             if (isEqualScore()) {
@@ -80,14 +76,15 @@ public class Game {
             }
         }
         if (isAdditionalShots()) {
-            if (!isPairOfShotsFull()) {
-                return false;
-            } else {
+            if (isPairOfShotsFull()) {
                 if (isEqualScore()) {
                     return false;
                 } else {
                     return true;
                 }
+
+            } else {
+                return false;
             }
         }
         return false;

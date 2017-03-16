@@ -54,36 +54,36 @@ public class GameTest {
 
     @Test
     public void testIsFinishedAfter10ShotsAndScore54() {
-        firstTeamShots(5, true);
-        secondTeamShots(4, true);
+        bothTeamShots(4, true);
+        firstTeamShots(1, true);
         secondTeamShots(1, false);
         assertThat(game.isFinished(), is(true));
     }
 
     @Test
     public void testIsFinishedAfter10ShotsAndScore55() {
-        firstTeamShots(5, true);
-        secondTeamShots(5, true);
+        bothTeamShots(5, true);
         assertThat(game.isFinished(), is(false));
     }
 
     @Test
     public void testIsNotFinishedAfter9ShotsAndScore50() {
-        firstTeamShots(1, true);
         bothTeamShots(4, true);
+        firstTeamShots(1, true);
         assertThat(game.isFinished(), is(false));
     }
 
     @Test
     public void testIsNotFinishedAfter11ShotsAndScore65() {
-        firstTeamShots(1, true);
         bothTeamShots(5, true);
+        firstTeamShots(1, true);
         assertThat(game.isFinished(), is(false));
     }
 
     @Test
     public void testIsFinishedAfter12ShotsAndScore65() {
         bothTeamShots(5, true);
+        firstTeamShots(1, true);
         secondTeamShots(1, false);
         assertThat(game.isFinished(), is(true));
     }
@@ -105,16 +105,14 @@ public class GameTest {
 
     @Test
     public void testDoNotShowsFailedPlayersSumAfter6Series() {
-        firstTeamShots(6, false);
-        secondTeamShots(6, false);
+        bothTeamShots(6, false);
         assertThat(game.score(), is("(0) Metallist : Arsenal (0)"));
     }
 
     @Test
     public void testShowsFailedPlayersSumAfter7Series() {
         when(game.getPlayerCostByName(anyString())).thenReturn(10);
-        firstTeamShots(7, false);
-        secondTeamShots(7, false);
+        bothTeamShots(7, false);
         assertThat(game.score(), is("(0) Metallist [70] : Arsenal (0) [70]"));
     }
 
