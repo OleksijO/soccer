@@ -4,117 +4,121 @@ package soccer;
  * Created by Oleksii_Onysymchuk on 3/14/2017.
  */
 public class Game {
-    private String firstTeamName;
-    private String secondTeamName;
+    private Team[] teams = {new Team(), new Team()};
     private int strikesCount = 0;
-    private int firstTeamScore = 0;
-    private int secondTeamScore = 0;
-    private int firstTeamFailedPenaltiesPlayersCost;
-    private int secondTeamFailedPenaltiesPlayersCost;
 
-    public Game() {
-    }
-
-    public Game(String firstTeamName, String secondTeamName) {
-        this.firstTeamName = firstTeamName;
-        this.secondTeamName = secondTeamName;
+    private class Team {
+        int score = 0;
+        int failedPenaltiesPlayersCost = 0;
+        public String name;
     }
 
     public boolean[] teamShotSuccessful(int teamNumber, boolean isSuccessful, String playerName) {
-        if (isFinished()){
+        teamNumber = checkAndPrepareTeamNumber(teamNumber);
+        if (isFinished()) {
             throw new IllegalStateException("The game is OVER!");
         }
         strikesCount++;
         addPlayerStatistics(playerName, isSuccessful);
         if (isSuccessful) {
-            if (teamNumber == 1) {
-                firstTeamScore++;
-            } else {
-                secondTeamScore++;
-            }
+            teams[teamNumber].score++;
         } else {
-            if (teamNumber == 1) {
-                firstTeamFailedPenaltiesPlayersCost += getPlayerCostByName(playerName);
-            } else {
-                secondTeamFailedPenaltiesPlayersCost += getPlayerCostByName(playerName);
-            }
+            teams[teamNumber].failedPenaltiesPlayersCost += getPlayerCostByName(playerName);
         }
         return getPlayersStatistics(playerName);
     }
 
-    protected int getPlayerCostByName(String playerName) {
-        return 0;
-    }
-
-    protected void addPlayerStatistics(String playerName, boolean isSuccessful) {
-
-    }
-
-    protected boolean[] getPlayersStatistics(String playerName) {
-        return new boolean[10];
+    private int checkAndPrepareTeamNumber(int teamNumber) {
+        if ((teamNumber == 1) || (teamNumber == 2)) {
+            return --teamNumber;
+        }
+        throw new IllegalArgumentException("Team number should be 1 or 2");
     }
 
     public String score() {
-        String firstPart = "(" + firstTeamScore + ") " + firstTeamName;
-        String secondPart = secondTeamName + " (" + secondTeamScore + ")";
-        if (strikesCount / 2 >= 7) {
-            firstPart = firstPart + " [" + firstTeamFailedPenaltiesPlayersCost + "]";
-            secondPart = secondPart + " [" + secondTeamFailedPenaltiesPlayersCost + "]";
+        Team team1 = getFirstTeam();
+        Team team2 = getSecondTeam();
+        String firstPart = String.format("(%d) %s", team1.score,team1.name);
+        String secondPart = String.format("%s (%d)", team2.name, team2.score);
+        if (is7SeriesPassed()) {
+            firstPart = String.format("%s [%d]", firstPart, team1.failedPenaltiesPlayersCost);
+            secondPart = String.format("%s [%d]", secondPart, team2.failedPenaltiesPlayersCost);
         }
         return firstPart + " : " + secondPart;
     }
 
+    private boolean is7SeriesPassed() {
+        return strikesCount / 2 >= 7;
+    }
+
     public boolean isFinished() {
-        if ((strikesCount < 10) && isPairOfShotsFull()) {
+        if (isMainSeries() && isSerieFinished()) {
             return scoreDifference() > strikesTo5();
         }
-        if ((strikesCount == 10)) {
-            if (isEqualScore()) {
-                return false;
-            } else {
-                return true;
-            }
+        if (isMainSeriesFinished()) {
+            return !isEqualScore();
         }
         if (isAdditionalShots()) {
-            if (isPairOfShotsFull()) {
-                if (isEqualScore()) {
-                    return false;
-                } else {
-                    return true;
-                }
-
-            } else {
-                return false;
-            }
+            return isSerieFinished() && !isEqualScore();
         }
         return false;
     }
+    private boolean isMainSeriesFinished() {
+        return strikesCount == 10;
+    }
 
-    public int strikesTo5() {
+    private boolean isMainSeries() {
+        return strikesCount < 10;
+    }
+
+    private int strikesTo5() {
         return 5 - strikesCount / 2;
     }
 
-    public int scoreDifference() {
-        return Math.abs(firstTeamScore - secondTeamScore);
+    private int scoreDifference() {
+        return Math.abs(getFirstTeam().score - getSecondTeam().score);
     }
 
-    public boolean isAdditionalShots() {
+    private boolean isAdditionalShots() {
         return strikesCount > 10;
     }
 
-    public boolean isPairOfShotsFull() {
+    private boolean isSerieFinished() {
         return strikesCount % 2 == 0;
     }
 
     private boolean isEqualScore() {
-        return firstTeamScore == secondTeamScore;
+        return getFirstTeam().score == getSecondTeam().score;
+    }
+
+
+    protected int getPlayerCostByName(String playerName) {
+        // Here should be service method call
+        return 0;
+    }
+
+    protected void addPlayerStatistics(String playerName, boolean isSuccessful) {
+        // Here should be service method call
+    }
+
+    protected boolean[] getPlayersStatistics(String playerName) {
+        // Here should be service method call
+        return new boolean[10];
+    }
+
+    private Team getFirstTeam() {
+        return teams[0];
+    }
+
+    private Team getSecondTeam() {
+        return teams[1];
     }
 
     public void setFirstTeamName(String firstTeamName) {
-        this.firstTeamName = firstTeamName;
+        getFirstTeam().name = firstTeamName;
     }
 
     public void setSecondTeamName(String secondTeamName) {
-        this.secondTeamName = secondTeamName;
+        getSecondTeam().name = secondTeamName;
     }
 }

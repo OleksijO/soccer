@@ -110,10 +110,33 @@ public class GameTest {
     }
 
     @Test
-    public void testShowsFailedPlayersSumAfter7Series() {
+    public void testShowsFailedPlayersSumAfter7SeriesWithScore00() {
         when(game.getPlayerCostByName(anyString())).thenReturn(10);
         bothTeamShots(7, false);
         assertThat(game.score(), is("(0) Metallist [70] : Arsenal (0) [70]"));
+    }
+
+    @Test
+    public void testShowsFailedPlayersSumAfter7SeriesWithScore77() {
+        when(game.getPlayerCostByName(anyString())).thenReturn(10);
+        bothTeamShots(7, true);
+        assertThat(game.score(), is("(7) Metallist [0] : Arsenal (7) [0]"));
+    }
+
+    @Test
+    public void testShowsFailedPlayersSumAfter7SeriesAndONeShotWithScore87() {
+        when(game.getPlayerCostByName(anyString())).thenReturn(10);
+        bothTeamShots(7, true);
+        firstTeamShots(1,true);
+        assertThat(game.score(), is("(8) Metallist [0] : Arsenal (7) [0]"));
+    }
+    @Test
+    public void testShowsFailedPlayersSumAfter8SeriesWithScore87() {
+        when(game.getPlayerCostByName(anyString())).thenReturn(10);
+        bothTeamShots(7, true);
+        firstTeamShots(1,true);
+        secondTeamShots(1,false);
+        assertThat(game.score(), is("(8) Metallist [0] : Arsenal (7) [10]"));
     }
 
     private void firstTeamShots(int quantity, boolean isSuccessful) {
